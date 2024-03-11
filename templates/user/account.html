@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load crispy_forms_filters %} {% load crispy_forms_tags %}
+{% block content %}
+<div class="container">
+    <div class="card w-75 shadow-sm mx-auto " >
+        <div class="card-body">
+            <form action="" method="post">
+                {% csrf_token %}
+                    <div class="row py-5 ">
+                        {% for field in form %}
+                            <div class="col-md-6 ">
+                                {{field|as_crispy_field}}
+                            </div>                        
+                        {% endfor %}
+                        
+                    </div>
+                    <input type="submit" class="btn btn-info fw-bold" value="Edit" >
+            </form>
+            <hr>
+            <div class="d-sm-flex align-items-center pt-3" id="deactivate">
+                <div class="fs-6">
+                    <b>Deactivate your account</b>
+                    <p>Details about your company account and password</p>
+                </div>
+                <div class="ml-auto">
+                    <button class="btn danger fs-6">Deactivate</button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

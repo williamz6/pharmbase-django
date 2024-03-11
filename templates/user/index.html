@@ -1,0 +1,9 @@
+{% extends "base.html" %} 
+{% block title %} Homepage {% endblock %} 
+{% block content %} 
+    {% if not request.user  %}
+        Welcome Guest
+    {% else %}        
+        <P>Welcome {{request.user}}</P> 
+    {% endif %}
+{% endblock %}
