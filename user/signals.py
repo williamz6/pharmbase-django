@@ -2,6 +2,7 @@ from .models import Profile
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from backend.models import Order, OrderItem, Drug
 
 
 @receiver(post_save, sender=User)
@@ -9,6 +10,14 @@ def createProfile(sender, instance, created, **kwargs):
     if created:
         user = instance
         Profile.objects.create(user=user, username=user.username, email=user.email)
+
+
+@receiver(post_save, sender=OrderItem)
+def update_order_total_price(sender, instance, created, **kwargs):
+    order = instance
+    if created:
+        order.total_price = order.calculate_total_price()
+        order.save()
 
 
 @receiver(post_save, sender=Profile)

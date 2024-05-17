@@ -23,7 +23,7 @@ class Profile(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.email
+        return self.username
 
     @classmethod
     def get_user_role(user):

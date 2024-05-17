@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<main>
+  <section class="vh-lg-100 mt-5 mt-lg-0 bg-soft d-flex align-items-center">
+      <div class="container">
+          <div class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
+              <div class="d-flex align-items-center justify-content-center w-100">
+                  <div class="row justify-content-center w-100">
+                      <div class="col-md-8 col-lg-6 col-xxl-8">
+                          <div class="card mb-0">
+                              <div class="card-body">
+                                  <h2 class="text-center">Order Drug</h2>
+                                  <form method="post" action="{% url 'order-drug' drug.id %}" class="mt-4">
+                                      {% csrf_token %}
+                                      <div class="form-group row">
+                                          <label for="drugName" class="col-sm-2 col-form-label">Drug</label>
+                                          <div class="col-sm-10">
+                                              <input type="text" readonly class="form-control-plaintext" id="drugName" value="{{ drug.name }}" name="drugName">
+                                          </div>
+                                      </div>
+                                      <div class="form-group row">
+                                          <label for="drugName" class="col-sm-2 col-form-label">Price</label>
+                                          <div class="col-sm-4">
+                                              <input type="text" readonly class="form-control-plaintext" id="price_per_item" value="{{ drug.price_per_item }}" name="price_per_item">
+                                          </div>
+                                      </div>
+                                      <div class="form-group row">
+                                          <label for="inputQuantity" class="col-sm-2 col-form-label">Quantity</label>
+                                          <div class="col-sm-10">
+                                              <input type="number" class="form-control" id="inputQuantity" placeholder="Quantity" name="quantity">
+                                          </div>
+                                      </div>
+                                      <input class="btn btn-secondary w-100 my-4 mb-4 rounded-2" type="submit" value="Order" />
+                                  </form>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+</main>
+
+{% endblock %}

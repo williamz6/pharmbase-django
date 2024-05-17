@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     "fontawesomefree",
+    "admin_soft.apps.AdminSoftDashboardConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -43,6 +44,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "user",
+    "backend",
+    "rest_framework",
 ]
 
 # crispy forms
@@ -125,6 +128,12 @@ MESSAGE_TAGS = {
     messages.DEBUG: "alert-primary",
 }
 
+#  path('', include('admin_soft.urls')),
+LOGIN_REDIRECT_URL = "/"
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -133,7 +142,7 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Etc/GMT-1"
 
 USE_I18N = True
-USE_L1ON= True
+USE_L1ON = True
 
 USE_TZ = True
 

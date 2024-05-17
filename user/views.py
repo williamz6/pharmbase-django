@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 from .models import Profile
+from backend.models import Drug, OrderItem, Order
 from django.contrib import messages
-from .forms import CustomUserCreationForm, ProfileForm
+from .forms import CustomUserCreationForm, ProfileForm, OrderItemForm
 
 
 # Create your views here.
@@ -36,6 +38,7 @@ def signin(request):
 
 
 def signup(request):
+
     page = "register"
     form = CustomUserCreationForm()
 
@@ -48,8 +51,8 @@ def signup(request):
             messages.success(request, "Account created successfully")
             login(request, user)
             return redirect("index")
-
-    messages.error(request, "Please correct the errors below.")
+        else:
+            messages.error(request, "Please correct the errors below.")
 
     context = {"page": page, "form": form}
 
@@ -61,7 +64,22 @@ def logout_view(request):
     return redirect("index")
 
 
+@login_required(login_url="login")
 def account_view(request):
+    user = request.user
+    profile = request.user.profile
+    orders = OrderItem.objects.filter(orders__customer=profile)
+
+    context = {
+        "user": user,
+        "profile": profile,
+        "orders":orders,
+    }
+    return render(request, "user/account.html", context)
+
+
+@login_required(login_url="login")
+def edit_account(request):
     user = request.user
     profile = request.user.profile
 
@@ -71,11 +89,79 @@ def account_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Account updated successfully")
-            return redirect('account')
+            return redirect("account")
 
     context = {
         "user": user,
         "profile": profile,
         "form": form,
     }
-    return render(request, "user/account.html", context)
+    return render(request, "user/edit_account.html", context)
+
+
+@login_required(login_url="login")
+def drug(request):
+    obj = Drug.objects.all()
+
+    context = {
+        "drugs": obj,
+    }
+    return render(request, "user/drugs.html", context)
+
+
+@login_required(login_url="login")
+def order_item(request, id):
+    user = request.user
+    profile = request.user.profile
+
+    drug_id = int(id)
+    try:
+        drug = Drug.objects.get(id=drug_id)
+        # if drug.in_stock:
+        #     print("Drug in stock")
+
+    except Drug.DoesNotExist:
+        return HttpResponseServerError("Drug does not exist")
+
+    if request.method == "POST":
+        if drug.in_stock:
+            quantity = request.POST.get("quantity")
+            price = drug.price_per_item
+
+            try:
+                quantity = int(quantity)
+            except ValueError:
+                return HttpResponseServerError("Invalid quantity")
+            
+            # calculate total_price
+            total_price= quantity * price
+
+            # Create Order instance if it doesn't exist yet
+            order, created = Order.objects.get_or_create(customer=profile, total_price=total_price)
+
+            # Create OrderItem directly
+            order_item = OrderItem(drug=drug, quantity=quantity, price_per_item=price)
+            order_item.save()
+            order_item.orders.add(order)
+            drug.stock_quantity -= quantity
+            drug.save()
+
+            messages.success(request, "Order added")
+            return redirect("orders")
+        else:
+            messages.error(request, "Insufficient stock")
+
+    context = {
+        "drug": drug,
+        "user": user,
+    }
+    return render(request, "user/order_drug.html", context)
+
+
+@login_required(login_url="login")
+def orders(request):
+    user = request.user
+    profile = request.user.profile
+    orders = OrderItem.objects.filter(orders__customer=profile)
+    context = {"orders": orders}
+    return render(request, "user/viewOrders.html", context)

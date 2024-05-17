@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0">
+          <h6>Orders table</h6>
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          <div class="table-responsive p-0">
+            <table class="table align-items-center mb-0 table-responsive">
+                
+                <thead>
+                    <tr>
+                      {% comment %} <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th> {% endcomment %}
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Drug</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Price Per Item</th>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
+                      <th class="text-secondary opacity-7"></th>
+                    </tr>
+                  </thead>
+                  
+                  {% if orders %}
+                  {% for order in orders %}
+                  <tbody>
+                    <tr>
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-center">
+                            <h6 class="mb-0 text-sm">{{order.drug}}</h6>
+                            <p class="text-xs text-secondary mb-0">{{order.quantity}}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="align-middle text-center">
+                        <p class="text-xs font-weight-bold mb-0">{{order.price_per_item}}</p>
+                      </td>
+                                              
+                     
+                      <td class="align-middle text-center">
+                        <h6 class="mb-0 text-sm"><small>NGN</small> {{order.total_price}}</h6>
+                      </td>
+                    </tr>
+                  </tbody>
+                {% endfor %}
+                {% else %}
+                <p class="text-xs font-weight-bold mb-0">View your orders here</p>
+                {% endif %}
+                    
+               
+              
+              
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% include "includes/footer.html" %}
+    
+  </div>
+  {% endblock content %}

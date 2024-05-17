@@ -1,88 +1,93 @@
-{% extends "base.html" %} {% block content %} {% if page == 'login' %}
+{% extends "base.html" %} {% load static %} {% block content %} {% if page == 'login' %}
 
 <main>
   <section class="vh-lg-100 mt-5 mt-lg-0 bg-soft d-flex align-items-center">
     <div class="container">
-        <div class="col-12 d-flex align-items-center justify-content-center">
-          <div
-            class="bg-white  shadow border-0 rounded border-light p-4 p-lg-5 w-100 fmxw-500"
-          >
-            <div class="text-center text-md-center mb-4 mt-md-0">
-              <h1 class="mb-0 h3">Pharmbase - Login</h1>
-              <br />
-            </div>
-
-            <form method="post" action="" class="mt-4">
-              {% csrf_token %}
-
-              <!-- Form -->
-              <div class="form-group mb-4">
-                <label for="email">Username</label>
-                
-                <div class="input-group">
-                  <span class="input-group-text" id="basic-addon1">
-                    <i class="fas fa-fas fa-user"></i>
-                  </span>
-                  <input
-                    type="text"
-                    name="username"
-                    placeholder="Username"
-                    class="form-control"
+      <div
+      class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
+      <div class="d-flex align-items-center justify-content-center w-100">
+        <div class="row justify-content-center w-100">
+          <div class="col-md-8 col-lg-6 col-xxl-6 col-xs-6">
+            <div class="card mb-0">
+              <div class="card-body">
+                <a href="/" class="text-nowrap logo-img text-center d-block py-3 w-100">
+                  <img src="{% static 'images/pharmbase.svg' %}" class="mx-auto w-25" alt="Pharmbase">
+                </a>
+                <p class="text-center">Login</p>
+                <form method="post" action="{% url 'login' %}" class="mt-4 form">
+                  {% csrf_token %}
+    
+                  <!-- Form -->
+                  <div class="form-group mb-4">
+                    <label for="email" class="fw-bold">Username</label>
                     
-                    required
-                    id="id_username"
-                  />
+                    <div class="input-group">
+                      <span class="input-group-text" id="basic-addon1">
+                        <i class="fas fa-fas fa-user"></i>
+                      </span>
+                      <input
+                        type="text"
+                        name="username"
+                        placeholder="Username"
+                        class="form-control"
+                        
+                        required
+                        id="id_username"
+                      />
+                    </div>
+                  </div>
+                  <!-- End of Form -->
+                  <div class="form-group">
+                    <!-- Form -->
+                    <div class="form-group mb-4">
+                      <label for="password" class="fw-bold">Password</label>
+                      <div class="input-group">
+                        <span class="input-group-text" id="basic-addon2">
+                          <span class="fas fa-unlock-alt"></span>
+                        </span>
+                        <input
+                          type="password"
+                          name="password"
+                          placeholder="Password"
+                          class="form-control"
+                          required
+                          id="id_password"
+                        />
+                      </div>
+                    </div>
+                    <!-- End of Form -->
+                    <div
+                      class="d-flex justify-content-between align-items-top mb-4"
+                    >
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          value=""
+                          id="remember"
+                        />
+                        <label class="form-check-label mb-0" for="remember">
+                          Remember me
+                          
+                        </label>
+                        <span class="ps-xl-5">forgot password?</span>
+                      </div>
+                    </div>
+                    <div class="auth__actions">
+                      <input class="btn btn-secondary" type="submit" value="Sign In" />
+                    </div>
+                  </div>
+                </form>
+                <div class="d-flex align-items-center justify-content-center mt-4">
+                  <p class="fs-6 mb-0 fw-bold">New to Pharmbase?</p>
+                  <a class="text-primary fw-bold ms-2" href="{% url 'register' %}">Create an account</a>
                 </div>
               </div>
-              <!-- End of Form -->
-              <div class="form-group">
-                <!-- Form -->
-                <div class="form-group mb-4">
-                  <label for="password">Password</label>
-                  <div class="input-group">
-                    <span class="input-group-text" id="basic-addon2">
-                      <span class="fas fa-unlock-alt"></span>
-                    </span>
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder="Password"
-                      class="form-control"
-                      required
-                      id="id_password"
-                    />
-                  </div>
-                </div>
-                <!-- End of Form -->
-                <div
-                  class="d-flex justify-content-between align-items-top mb-4"
-                >
-                  <div class="form-check">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      value=""
-                      id="remember"
-                    />
-                    <label class="form-check-label mb-0" for="remember">
-                      Remember me
-                    </label>
-                  </div>
-                </div>
-                <div class="auth__actions">
-                  <input class="btn btn-secondary" type="submit" value="Sign In" />
-                </div>
-              </div>
-            </form>
-
-            <br />
-            <div class="auth__alternative">
-              <p>You haven't signed up?</p>
-              <a href="{% url 'register' %}">Register</a>
             </div>
           </div>
         </div>
       </div>
+    </div>
     </div>
   </section>
 </main>
@@ -92,7 +97,47 @@
 <main>
   <section class="vh-lg-100 mt-5 mt-lg-0 bg-soft d-flex align-items-center">
     <div class="container">
-        <div class="col-12 d-flex align-items-center justify-content-center">
+      <div
+      class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
+      <div class="d-flex align-items-center justify-content-center w-100">
+        <div class="row justify-content-center w-100">
+          <div class="col-md-8 col-lg-6 col-xxl-8">
+            <div class="card mb-0">
+              <div class="card-body">
+                <a href="/" class="text-nowrap logo-img text-center d-block py-3 w-100">
+                  <img src="{% static 'images/pharmbase.svg' %}" class="mx-auto" style="width:50px; height:50px;" alt="Pharmbase">
+                </a>
+                <h2 class="text-center">Register</h2>
+                <form method="post" action="{% url 'register' %}" class="mt-4">
+                  {% csrf_token %}
+    
+                  {% for field in form %}
+                  <div class="form-group">
+                    <label for="formInput#text">{{field.label}}</label>
+                    <div class="input-group">
+                      {{field}}
+                      
+                    </div>          
+               
+                    {% for error in field.errors %}
+                    <p style="color: red">{{error}}</p>
+                    {% endfor %}
+                  </div>
+                  {% endfor %}
+                  <input class="btn btn-secondary w-100 my-4 mb-4 rounded-2" type="submit" value="Sign Up" />
+                </form>
+                <div class="d-flex align-items-center justify-content-center mt-4">
+                  <p class="fs-6 mb-0 fw-bold">Already have an account?</p>
+                  <a class="text-primary fw-bold ms-2" href="{% url 'login' %}">Sign In</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+        <!-- <div class="col-12 d-flex align-items-center justify-content-center">
           <div
             class="bg-white shadow border-0 rounded border-light p-4 p-lg-5 w-100 fmxw-500"
           >
@@ -108,8 +153,7 @@
                 <label for="formInput#text">{{field.label}}</label>
                 <div class="input-group">
                   {{field}}
-                </div>
-          
+                </div>          
           
                 {% for error in field.errors %}
                 <p style="color: red">{{error}}</p>
@@ -124,7 +168,7 @@
               <a href="{% url 'login' %}">Log In</a>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </section>
