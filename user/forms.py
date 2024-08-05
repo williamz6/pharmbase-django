@@ -6,7 +6,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 from backend.models import Drug, Order, OrderItem
-
+from django.forms.models import inlineformset_factory
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
@@ -43,15 +43,24 @@ class ProfileForm(ModelForm):
         for field_name, field in self.fields.items():
             field.widget.attrs.update({"class": "form-control"})
 
+class OrderForm(ModelForm):
+    class Meta:
+        model = Order
+        fields = []
 
 class OrderItemForm(ModelForm):
     class Meta:
         model = OrderItem
-        fields = ["drug", "quantity"]
-        drug = forms.CharField(widget=forms.TextInput(attrs={"readonly": "readonly"}))
+        fields = ['drug', 'quantity'] 
 
-    def __init__(self, *args, **kwargs):
-        drug_name = kwargs.pop("drug_name",None)
-        super(OrderItemForm, self).__init__(*args, **kwargs)
-        if drug_name:
-            self.fields['drug'].initial = drug_name
+    def clean_quantity(self):
+        quantity= self.cleaned_data.get('quantity')
+        drug= self.cleaned_data.get('drug')
+
+        if quantity <= 0:
+            raise forms.ValidationError('Quantity must be a positive integer')
+        
+        if drug and quantity > drug.stock_quantity:
+            raise forms.ValidationError(f'Only {drug.stock_quantity} items available in stock')
+        
+        return quantity

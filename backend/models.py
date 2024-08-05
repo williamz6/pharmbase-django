@@ -51,26 +51,6 @@ class Drug(models.Model):
 
 
 class Order(models.Model):
-
-    customer = models.ForeignKey(
-        Profile, null=True, blank=True, on_delete=models.CASCADE
-    )
-    total_price = models.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True, default=0.00
-    )
-
-    def __str__(self):
-        return f"Order - {self.customer} "
-
-    def update_total_price(self):
-        total_price = sum(
-            item.quantity * item.drug.price_per_item for item in self.items.all()
-        )
-        self.total_price = total_price
-        self.save()
-
-
-class OrderItem(models.Model):
     ORDER_STATUS_CHOICES = (
         ("pending", "pending"),
         ("processing", "processing"),
@@ -78,45 +58,39 @@ class OrderItem(models.Model):
         ("delivered", "Delivered"),
         ("cancelled", "Cancelled"),
     )
-    drug = models.ForeignKey(Drug, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
-    price_per_item = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    customer = models.ForeignKey(
+        Profile, null=True, blank=True, on_delete=models.CASCADE
+    )
+    total_price = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True, default=0.00
+    )
     status = models.CharField(
         max_length=50, choices=ORDER_STATUS_CHOICES, default="pending"
     )
-    orders = models.ManyToManyField(Order, related_name="items", blank=True)
+    created= models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-created']
     def __str__(self):
-        return f"{self.drug}"
+        return f"Order {self.id} by {self.customer}"
+    
+    def get_drugs(self):
+        return self.orderitem_set.select_related('drug')
 
-    @property
-    def getCustomer(self):
-        orders = self.orders.all()
-        customer = set(order.customer for order in orders)
-        return customer
 
-    def calculate_total_price(self):
-        # Convert quantity and price_per_item to numeric types if they are strings
-        try:
-            quantity = int(self.quantity)
-            price_per_item = Decimal(self.price_per_item)
-        except (TypeError, ValueError):
-            # Handle conversion errors
-            return Decimal(0.00)
 
-        # Calculate total price and round it to 2 decimal places
-        total_price = round(quantity * price_per_item, 2)
-        return total_price
+class OrderItem(models.Model):
+    
+    drug = models.ForeignKey(Drug, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
+    created = models.DateTimeField(auto_now_add=True)
+    quantity = models.PositiveIntegerField()
+    
+    def __str__(self):
+        return f"{self.quantity} of {self.drug.name} in order {self.order.id}"
 
-    def save(self, *args, **kwargs):
-        # Calculate total price before saving
-        self.total_price = self.calculate_total_price()
-        super().save(*args, **kwargs)
-        # update stock quantity for associated drugs
-        # for order in self.orders.all():
-        #     for drug in order.items.all():
-        #         drug.updateStock(self.quantity)
-        # Update total price for associated orders
-        for order in self.orders.all():
-            order.update_total_price()
+    
+    # code to check if ordered quantity is more than stock quantity
+  
+    

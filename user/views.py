@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Profile
 from backend.models import Drug, OrderItem, Order
 from django.contrib import messages
-from .forms import CustomUserCreationForm, ProfileForm, OrderItemForm
+from .forms import CustomUserCreationForm, ProfileForm, OrderForm, OrderItemForm
 
 
 # Create your views here.
@@ -108,60 +108,99 @@ def drug(request):
     }
     return render(request, "user/drugs.html", context)
 
-
 @login_required(login_url="login")
-def order_item(request, id):
-    user = request.user
-    profile = request.user.profile
+def create_order(request):
+    customer = request.user.profile
+    if request.method == "POST":
+        drug_id = request.POST.get('drug')
+        quantity = request.POST.get('quantity')
+        quantity = int(quantity)
+        drug = Drug.objects.get(id=drug_id)
 
+        order_item_form = OrderItemForm(request.POST)
+        if order_item_form.is_valid():
+            if drug.stock_quantity >= quantity:
+                order = Order.objects.create(customer=customer)
+                
+                order_item = order_item_form.save(commit=False)
+                order_item.order = order
+                order_item.drug = drug
+                order_item.quantity = quantity
+                order_item.save()
+            # update stock quantity
+                drug.stock_quantity -= order_item.quantity
+                drug.save()
+                messages.success(request, "ordern has been created")
+                return redirect('order-success')
+                
+            else:
+                context={
+                    'order_form': order_form,
+                    'drugs': Drug.objects.all(),
+                    'error': 'Not enough drug in store.'
+                }
+                return render(request, "user/drugs.html", context)
+        else:
+            order_form = OrderForm()
+            order_item_form = OrderItemForm()
+            context={
+                    'order_form': order_form,
+                    'drugs': Drug.objects.all(),
+                    'error': 'Not enough drug in store.'
+                }
+            return render(request, "user/drugs.html", context)
+    return redirect('drugs')
+        
+@login_required(login_url="login")
+def orderSuccess(request):
+    return render(request, "user/order_success.html")
+
+""" 
+@login_required(login_url="login")
+
+def order_item(request, id):
     drug_id = int(id)
     try:
         drug = Drug.objects.get(id=drug_id)
-        # if drug.in_stock:
-        #     print("Drug in stock")
-
     except Drug.DoesNotExist:
-        return HttpResponseServerError("Drug does not exist")
+        return HttpResponseNotFound("Drug not found")
 
     if request.method == "POST":
-        if drug.in_stock:
-            quantity = request.POST.get("quantity")
-            price = drug.price_per_item
-
-            try:
-                quantity = int(quantity)
-            except ValueError:
-                return HttpResponseServerError("Invalid quantity")
-            
-            # calculate total_price
-            total_price= quantity * price
-
-            # Create Order instance if it doesn't exist yet
-            order, created = Order.objects.get_or_create(customer=profile, total_price=total_price)
-
-            # Create OrderItem directly
-            order_item = OrderItem(drug=drug, quantity=quantity, price_per_item=price)
-            order_item.save()
-            order_item.orders.add(order)
-            drug.stock_quantity -= quantity
-            drug.save()
-
-            messages.success(request, "Order added")
+        form = OrderItemForm(request.POST)
+        if form.is_valid():
+            order = form.save(commit=False)
+            order.customer = request.user.profile
+            # order.save()
+            quantity = request.POST.get('quantity')
+            # order.save()
+            if OrderItem.is_order_quantity_valid:
+                
+                OrderItem.objects.create(
+                    drugID=drug,
+                    orderID=order_item,
+                    quantity=int(quantity),
+                    unit_price=drug.price_per_item
+                )
+            else:
+                messages.error(request, "Maximum order quantity exceeded")
+                return redirect('index')
+                
             return redirect("orders")
-        else:
-            messages.error(request, "Insufficient stock")
-
+    else:
+        form = OrderItemForm()
+    
     context = {
-        "drug": drug,
-        "user": user,
+        'drug': drug,
+        'form': form,
     }
-    return render(request, "user/order_drug.html", context)
-
+    return render(request, "user/order_drug.html", context) """
 
 @login_required(login_url="login")
 def orders(request):
     user = request.user
     profile = request.user.profile
-    orders = OrderItem.objects.filter(orders__customer=profile)
-    context = {"orders": orders}
+    orders_list = Order.objects.filter(customer=profile).prefetch_related('items__drug')
+    context={
+        'orders': orders_list
+    }
     return render(request, "user/viewOrders.html", context)

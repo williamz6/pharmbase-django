@@ -11,13 +11,18 @@ def createProfile(sender, instance, created, **kwargs):
         user = instance
         Profile.objects.create(user=user, username=user.username, email=user.email)
 
+# @receiver(post_save, sender=OrderItem)
+# def update_order_total_price(sender, instance, **kwargs):
+#     order = instance
+#     order_price = sum(item.quantity *item.drug.price_per_item for order.orderitem_set.all())
 
 @receiver(post_save, sender=OrderItem)
-def update_order_total_price(sender, instance, created, **kwargs):
-    order = instance
-    if created:
-        order.total_price = order.calculate_total_price()
-        order.save()
+@receiver(post_delete, sender=OrderItem)
+def update_order_total(sender, instance, **kwargs):
+    order = instance.order
+    total_amount = sum(item.quantity * item.drug.price_per_item for item in order.items.all())
+    order.total_price = total_amount
+    order.save()
 
 
 @receiver(post_save, sender=Profile)
